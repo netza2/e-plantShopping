@@ -6,31 +6,65 @@ import './CartItem.css';
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const parseItemCostToInteger = (itemCost) => {
+    /*
+        Remove currency symbol before multiplication.
+        Otherwise, NaN returned.
+        Improve in future: Use regex to remove all possible currency symbols?
+    */
+    return parseInt(itemCost.replace('$', ''), 10);
+};
 
   // Calculate total amount for all products in the cart
-  const calculateTotalAmount = () => {
- 
-  };
+const calculateTotalAmount = () => {
+    let totalCost = 0;
 
-  const handleContinueShopping = (e) => {
-   
-  };
+    cart.forEach((item) => {
+        const itemCost = parseItemCostToInteger(item.cost);
+        totalCost += itemCost * item.quantity;
+    });
 
+    return totalCost;
+};
 
+const handleContinueShopping = (e) => {
+    onContinueShopping(e);
+};
 
-  const handleIncrement = (item) => {
-  };
+const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+};
 
-  const handleDecrement = (item) => {
-   
-  };
+const handleIncrement = (item) => {
+    const updatedItem = { ...item };
+    updatedItem.quantity++;
+    dispatch(updateQuantity(updatedItem));
+};
 
-  const handleRemove = (item) => {
-  };
+const handleDecrement = (item) => {
+    const updatedItem = { ...item };
 
-  // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
-  };
+    if (updatedItem.quantity == 1) {
+        // Remove item if number of items gets decremented to 0
+        dispatch(removeItem(updatedItem));
+    } else {
+        updatedItem.quantity--;
+        dispatch(updateQuantity(updatedItem));
+    }
+};
+
+const handleRemove = (item) => {
+    dispatch(removeItem(item));
+};
+
+// Calculate total cost based on quantity for an item
+const calculateTotalCost = (item) => {
+    let totalCost = 0;
+    const itemCost = parseItemCostToInteger(item.cost);
+    totalCost = item.quantity * itemCost;
+
+    return totalCost;
+};
 
   return (
     <div className="cart-container">
@@ -57,7 +91,7 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e) => handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
